@@ -6,6 +6,8 @@ import {
   StatusBar,
   ScrollView,
   Dimensions,
+  Pressable,
+  Animated,
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import Fish from './fish.svg';
@@ -19,11 +21,13 @@ interface DataMonitoring {
   statusKetinggianAir: string;
   statusSuhu: string;
   statusPH: string;
+  otomatis: string;
 }
 const Dashboard = (): React.JSX.Element => {
   const [dataMonitoring, setDataMonitoring] = useState<DataMonitoring | null>(
     null,
   );
+  const scrollY = new Animated.Value(0);
 
   useEffect(() => {
     const fetchData = () => {
@@ -42,6 +46,7 @@ const Dashboard = (): React.JSX.Element => {
                 statusKetinggianAir: fetchedData['status KETINGGIAN AIR'],
                 statusSuhu: fetchedData['status SUHU'],
                 statusPH: fetchedData['status pH'],
+                otomatis: fetchedData.OTOMATIS,
               });
             } else {
               setDataMonitoring(null);
@@ -55,15 +60,101 @@ const Dashboard = (): React.JSX.Element => {
     fetchData();
   }, []);
 
+  const handlePompaAutomatisClick = () => {
+    try {
+      database().ref('/FirebasePWI').update({OTOMATIS: '1'});
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };
+
+  const handlePompaManualClick = () => {
+    try {
+      database().ref('/FirebasePWI').update({OTOMATIS: '0'});
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [300, 80],
+    extrapolate: 'clamp',
+  });
+
   return (
     <>
       <StatusBar barStyle="default" backgroundColor="#BEADFA" />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.headerContainer}>
+      <Animated.ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: false},
+        )}>
+        {/* Header Start */}
+        <Animated.View style={[styles.headerContainer, {height: headerHeight}]}>
           <Text style={styles.header}>Monitoring Air</Text>
           <View style={styles.svgContainer}>
             <Fish width={300} height={400} />
           </View>
+        </Animated.View>
+        {/* Header End */}
+        {/* Pompa Air Otomatis */}
+        <Text style={styles.statusHeader}>Pompa Otomatis</Text>
+        <View style={styles.pompaContainer}>
+          <Pressable onPress={handlePompaAutomatisClick}>
+            <View
+              style={
+                dataMonitoring?.otomatis === '1'
+                  ? styles.pompaCardOn
+                  : styles.pompaCardOff
+              }>
+              <Text style={styles.pompaText}>
+                Pompa 1 {dataMonitoring?.otomatis === '1' ? 'ON' : 'OFF'}
+              </Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={handlePompaAutomatisClick}>
+            <View
+              style={
+                dataMonitoring?.otomatis === '1'
+                  ? styles.pompaCardOn
+                  : styles.pompaCardOff
+              }>
+              <Text style={styles.pompaText}>
+                Pompa 2 {dataMonitoring?.otomatis === '1' ? 'ON' : 'OFF'}
+              </Text>
+            </View>
+          </Pressable>
+        </View>
+        {/* Pompa Manual */}
+        <Text style={styles.statusHeader}>Pompa Manual</Text>
+        <View style={styles.pompaContainer}>
+          <Pressable onPress={handlePompaManualClick}>
+            <View
+              style={
+                dataMonitoring?.otomatis === '0'
+                  ? styles.pompaCardOn
+                  : styles.pompaCardOff
+              }>
+              <Text style={styles.pompaText}>
+                Pompa 1 {dataMonitoring?.otomatis === '0' ? 'ON' : 'OFF'}
+              </Text>
+            </View>
+          </Pressable>
+          <Pressable onPress={handlePompaManualClick}>
+            <View
+              style={
+                dataMonitoring?.otomatis === '0'
+                  ? styles.pompaCardOn
+                  : styles.pompaCardOff
+              }>
+              <Text style={styles.pompaText}>
+                Pompa 2 {dataMonitoring?.otomatis === '0' ? 'ON' : 'OFF'}
+              </Text>
+            </View>
+          </Pressable>
         </View>
         {/* Status */}
         <Text style={styles.statusHeader}>Status Monitoring</Text>
@@ -122,7 +213,7 @@ const Dashboard = (): React.JSX.Element => {
           </View>
         </View>
         <View style={styles.bottomSpace} />
-      </ScrollView>
+      </Animated.ScrollView>
     </>
   );
 };
@@ -253,5 +344,30 @@ const styles = StyleSheet.create({
   statusValue: {fontWeight: '600', color: '#6F7789', fontSize: 18},
   bottomSpace: {
     marginBottom: 40,
+  },
+  pompaContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+    marginTop: 15,
+  },
+  pompaCardOn: {
+    backgroundColor: '#B1C381',
+    minWidth: 180,
+    padding: 20,
+    borderRadius: 15,
+  },
+  pompaCardOff: {
+    backgroundColor: '#DC8686',
+    minWidth: 180,
+    padding: 20,
+    borderRadius: 15,
+  },
+  pompaText: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
