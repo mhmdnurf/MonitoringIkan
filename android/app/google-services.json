@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "997671918089",
+    "firebase_url": "https://monitoringaquarium-default-rtdb.firebaseio.com",
+    "project_id": "monitoringaquarium",
+    "storage_bucket": "monitoringaquarium.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997671918089:android:749efb5f42147113dfb6d8",
+        "android_client_info": {
+          "package_name": "com.monitoringikan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "997671918089-douohu7bad1fkt51csbaqh64gb00sb1q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACRzHyHHv_-G5DzzxfyQN-uAqYnt5ZsV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "997671918089-douohu7bad1fkt51csbaqh64gb00sb1q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
