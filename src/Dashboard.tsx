@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     marginLeft: 10,
+    color: '#6F7789',
   },
   statusKekeruhan: {
     backgroundColor: 'white',
