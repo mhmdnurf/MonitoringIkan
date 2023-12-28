@@ -29,6 +29,7 @@ const Dashboard = (): React.JSX.Element => {
   const [dataMonitoring, setDataMonitoring] = useState<DataMonitoring | null>(
     null,
   );
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const scrollY = new Animated.Value(0);
 
   useEffect(() => {
@@ -61,7 +62,12 @@ const Dashboard = (): React.JSX.Element => {
       }
     };
 
+    const intervalId = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
     fetchData();
+    return () => clearInterval(intervalId);
   }, []);
 
   const handlePompaAutomatisClick = () => {
@@ -102,6 +108,12 @@ const Dashboard = (): React.JSX.Element => {
     extrapolate: 'clamp',
   });
 
+  const formattedTime = currentDateTime.toLocaleTimeString();
+  const formattedDate = currentDateTime.toLocaleDateString();
+  const dayOfWeek = new Intl.DateTimeFormat('id-ID', {weekday: 'long'}).format(
+    currentDateTime,
+  );
+
   return (
     <>
       <StatusBar barStyle="default" backgroundColor="#BEADFA" />
@@ -120,6 +132,13 @@ const Dashboard = (): React.JSX.Element => {
           </View>
         </Animated.View>
         {/* Header End */}
+        {/* Date Start */}
+        <View style={styles.dateContainer}>
+          <Text style={styles.dayOfWeekText}>{dayOfWeek}</Text>
+          <Text style={styles.clockText}>{formattedTime}</Text>
+          <Text style={styles.dateText}>{formattedDate}</Text>
+        </View>
+        {/* Date End */}
         {/* Pompa Air Otomatis */}
         <Text style={styles.statusHeader}>Pompa Otomatis</Text>
         <View style={styles.pompaContainer}>
@@ -390,5 +409,33 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     textAlign: 'center',
+  },
+  clockText: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: '600',
+  },
+  dateText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: '600',
+  },
+  dayOfWeekText: {
+    fontSize: 18,
+    marginTop: 5,
+    color: 'white',
+    fontWeight: '600',
+  },
+  dateContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#8EA7E9',
+    elevation: 5,
   },
 });
