@@ -22,6 +22,8 @@ interface DataMonitoring {
   statusSuhu: string;
   statusPH: string;
   otomatis: string;
+  POMPA1: string;
+  POMPA2: string;
 }
 const Dashboard = (): React.JSX.Element => {
   const [dataMonitoring, setDataMonitoring] = useState<DataMonitoring | null>(
@@ -47,6 +49,8 @@ const Dashboard = (): React.JSX.Element => {
                 statusSuhu: fetchedData['status SUHU'],
                 statusPH: fetchedData['status pH'],
                 otomatis: fetchedData.OTOMATIS,
+                POMPA1: fetchedData.POMPA1,
+                POMPA2: fetchedData.POMPA2,
               });
             } else {
               setDataMonitoring(null);
@@ -62,15 +66,31 @@ const Dashboard = (): React.JSX.Element => {
 
   const handlePompaAutomatisClick = () => {
     try {
-      database().ref('/FirebasePWI').update({OTOMATIS: '1'});
+      database()
+        .ref('/FirebasePWI')
+        .update({OTOMATIS: '1', POMPA1: '0', POMPA2: '0'});
     } catch (error) {
       console.error('Error updating data:', error);
     }
   };
-
-  const handlePompaManualClick = () => {
+  const handlePompaManualSatu = () => {
     try {
-      database().ref('/FirebasePWI').update({OTOMATIS: '0'});
+      const ref = database().ref('/FirebasePWI');
+      ref.once('value', snapshot => {
+        const pompa1 = snapshot.val().POMPA1;
+        ref.update({OTOMATIS: '0', POMPA1: pompa1 === '1' ? '0' : '1'});
+      });
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };
+  const handlePompaManualDua = () => {
+    try {
+      const ref = database().ref('/FirebasePWI');
+      ref.once('value', snapshot => {
+        const pompa2 = snapshot.val().POMPA2;
+        ref.update({OTOMATIS: '0', POMPA2: pompa2 === '1' ? '0' : '1'});
+      });
     } catch (error) {
       console.error('Error updating data:', error);
     }
@@ -131,27 +151,27 @@ const Dashboard = (): React.JSX.Element => {
         {/* Pompa Manual */}
         <Text style={styles.statusHeader}>Pompa Manual</Text>
         <View style={styles.pompaContainer}>
-          <Pressable onPress={handlePompaManualClick}>
+          <Pressable onPress={handlePompaManualSatu}>
             <View
               style={
-                dataMonitoring?.otomatis === '0'
+                dataMonitoring?.POMPA1 === '1'
                   ? styles.pompaCardOn
                   : styles.pompaCardOff
               }>
               <Text style={styles.pompaText}>
-                Pompa 1 {dataMonitoring?.otomatis === '0' ? 'ON' : 'OFF'}
+                Pompa 1 {dataMonitoring?.POMPA1 === '1' ? 'ON' : 'OFF'}
               </Text>
             </View>
           </Pressable>
-          <Pressable onPress={handlePompaManualClick}>
+          <Pressable onPress={handlePompaManualDua}>
             <View
               style={
-                dataMonitoring?.otomatis === '0'
+                dataMonitoring?.POMPA2 === '1'
                   ? styles.pompaCardOn
                   : styles.pompaCardOff
               }>
               <Text style={styles.pompaText}>
-                Pompa 2 {dataMonitoring?.otomatis === '0' ? 'ON' : 'OFF'}
+                Pompa 2 {dataMonitoring?.POMPA2 === '1' ? 'ON' : 'OFF'}
               </Text>
             </View>
           </Pressable>
